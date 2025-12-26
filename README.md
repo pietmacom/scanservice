@@ -2,8 +2,8 @@
 
 - udev and dbus are running locally in the container
 - scanbd is started and restarted by udev when the scanner is connected or turned on
-- scanes are processed by scripts (OCR, drop empty pages, color correction, PDF-Creation)
-- done documents and unprocessed scannes are located in /dest
+- scans are processed by scripts (OCR, drop empty pages, color correction, PDF creation)
+- done documents and unprocessed scans are located in /dest
 - processing is done in /work
 - unprocessed scannes are resumed on every start
 

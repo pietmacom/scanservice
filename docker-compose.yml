@@ -1,0 +1,12 @@
+services:
+  scanservice:
+    image: pietmacom/scanservice
+    build:
+      context: .
+      network: host
+    privileged: true
+    volumes:
+#       - /dest:/dest
+       - /run/dbus:/host/run/dbus
+       - /dev/bus/usb:/dev/bus/usb
+       

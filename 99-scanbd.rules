@@ -1,0 +1,9 @@
+ACTION=="bind" \
+, ATTRS{idProduct}=="11fc" \
+, ATTRS{idVendor}=="04c5" \
+, RUN+="/script/scanbd.script start"
+
+ACTION=="unbind" \
+, ATTRS{idProduct}=="11fc" \
+, ATTRS{idVendor}=="04c5" \
+, RUN+="/script/scanbd.script stop"

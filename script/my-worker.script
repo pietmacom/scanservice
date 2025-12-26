@@ -1,0 +1,97 @@
+#!/bin/bash -ex
+tmpdir=/work
+
+PARALLEL="parallel --tmpdir $tmpdir --results {}.log --halt now,fail=1"
+
+IMAGEMAGICK_LIMIT_MEMORY="1024MiB"
+IMAGEMAGICK_LIMIT_MAP="4096MiB"
+IMAGEMAGICK_CONVERT="convert -limit memory ${IMAGEMAGICK_LIMIT_MEMORY} -limit map ${IMAGEMAGICK_LIMIT_MAP}"
+
+TESSERACT_LANGUAGE="deu"
+TESSERACT="tesseract -l ${TESSERACT_LANGUAGE} --psm 1 --oem 3"
+TESSERACT_PARALLEL="parallel -j1 --tmpdir $tmpdir --timeout 120s --results {}.log --halt never"
+
+GS="gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf"
+
+
+_baseDir="$(realpath $(dirname $0))"
+
+tmpworkdir=$tmpdir/$(basename $2)
+mkdir -p $tmpworkdir
+
+# WORKER
+# cleanup : rm lept* *.tiff.* magic*
+case $1 in
+    tiffToPdf+ocr)
+		PARALLEL_JOBS="6"
+		PARALLEL="${PARALLEL} -j${PARALLEL_JOBS}"
+		
+		# TODO convert richtet am unterem rand aus
+		cp -r $2/* $tmpworkdir
+		cd $tmpworkdir
+	
+		# Lange Erkennung abbrechen 
+		# Leere Ausgabedatei ignorieren
+		# Im Fehlerfall ohne Texterkennung weiter machen
+		ls -b -1 -v -X . | grep -i '.tiff$' | ${TESSERACT_PARALLEL} "${TESSERACT} {} {}.tmp pdf ; if [ -s '{}.tmp.pdf' ]; then mv {}.tmp.pdf {}.pdf ; fi" || true
+		
+		# Fehlerhaft Seiten als Bild konvertieren
+		ls -b -1 -v -X . | grep -i '.tiff$' | ${PARALLEL} "if [ -e '{}.tmp.pdf' ]; then rm {}.tmp.pdf ; ${IMAGEMAGICK_CONVERT} -compress Fax {} {}.pdf ; fi"
+	
+		# Einzelseiten zusammenfassen
+		export TEMP=$tmpdir
+		ls -b -1 -v -X . | grep -i '.tiff.pdf$' | xargs sh -c "${GS} -sPAPERSIZE=a4 -dPDFFitPage "\$@"" gs
+		# -dFIXEDMEDIA
+		
+	#	cp pages.pdf "$2/../$(date +%Y%m%d-%H%M%S)_document.pdf"
+		# stay with one subshell - in most!
+		_fileName="$(${_baseDir}/my-filename.script pages.pdf)"
+		cp pages.pdf "$2/../${_fileName}"
+		rm -rf $2 $tmpworkdir
+		exit
+		;;
+
+    pnmToPdf)
+		PARALLEL_JOBS="4"
+		PARALLEL="${PARALLEL} -j${PARALLEL_JOBS}"
+	
+		# Erst das Bild rotiere, pdf erstellen, pdf rotieren
+	#	ls -b -1 -v -X *.pnm | parallel -j$jobs "convert -fuzz 20% -trim {} {}.crop"
+	#	ls -b -1 -v -X *.pnm.crop | parallel -j$jobs "convert {} -rotate 180 {}.rot"
+	#	ls -b -1 -v -X *.pnm.crop.rot | parallel -j$jobs "convert {} -page A4 {}.pdf"
+	#	ls -b -1 -v -X *.pnm.crop.rot.pdf | parallel -j$jobs "convert {} -rotate 180 {}.rot.pdf"
+	#	ls -b -1 -v -X *.pnm.crop.rot.pdf.rot.pdf | xargs sh -c 'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf  "$@"' gs
+	
+		# TODO convert richtet am unterem rand aus
+		cp -r $2/* $tmpworkdir
+		cd $tmpworkdir
+		
+		ls -b -1 -v -X . | grep -i '.pnm$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} -page A4 {} {}.pdf"
+		
+		# Einzelseiten zusammenfassen
+		export TEMP=$tmpdir
+		ls -b -1 -v -X . | grep -i '.pnm.pdf$' | xargs sh -c "${GS} "\$@"" gs
+		cp pages.pdf "$2/../$(date +%Y%m%d-%H%M%S)_document.pdf"
+		rm -rf $2 $tmpworkdir
+		exit
+		;;
+
+    pnmToPdf+trim)
+		PARALLEL_JOBS="4"
+		PARALLEL="${PARALLEL} -j${PARALLEL_JOBS}"
+	
+		cp -r $2/* $tmpworkdir
+		cd $tmpworkdir
+	
+		ls -b -1 -v -X . | grep -i '.pnm$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} -fuzz 20% -trim {}  {}.crop"
+		ls -b -1 -v -X . | grep -i '.pnm.crop$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} {} {}.pdf"
+	
+		# Einzelseiten zusammenfassen
+		export TEMP=$tmpdir
+		ls -b -1 -v -X . | grep -i '.pnm.crop.pdf$' | xargs sh -c "${GS} "\$@"" gs
+		cp pages.pdf "$2/../$(date +%Y%m%d-%H%M%S)_document.pdf"
+		rm -rf $2 $tmpworkdir
+		exit
+		;;
+esac
+

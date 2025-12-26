@@ -1,0 +1,26 @@
+#!/bin/bash -ex
+
+case "$1" in
+  start)
+	if [ -e /run/scanbd.pid ];
+	then
+		kill -s SIGTERM $(cat /run/scanbd.pid) || true
+		rm /run/scanbd.pid
+	fi
+	
+	HOME=/var/lib/saned SANE_CONFIG_DIR=/etc/scanbd stdbuf -i0 -o0 /usr/sbin/scanbd -f -c /etc/scanbd/scanbd.conf >> /var/log/scanbd.log 2>&1 &
+	jobs -p > /run/scanbd.pid
+	disown %1
+	echo "Started"
+	;;
+	
+  stop)
+	if [ -e /run/scanbd.pid ];
+	then
+		kill -s SIGTERM $(cat /run/scanbd.pid) || true
+		rm /run/scanbd.pid
+		echo "Killed"
+	fi
+	;;
+  *)
+esac

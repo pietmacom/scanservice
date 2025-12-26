@@ -1,0 +1,7 @@
+neue struktur
+
+10_scanbd_scan
+11_scanbd_exec_run
+15_scanbd_exec_resume
+20_process
+21_process_filename

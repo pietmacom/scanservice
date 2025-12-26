@@ -1,0 +1,114 @@
+#!/bin/bash -ex
+
+# Findet Zeile mit wenigsten führenden Leerzeichen und
+# entfernt diese an allen Zeilen
+function removeIndent() {
+	stdin=$(cat)
+	shortestIndent=$(echo "$stdin" \
+			    | awk -v shortestIndentLength=1000 '{
+					lineLength=length($0)
+					sub("^\\s*", "", $0)
+					indentLength = lineLength - length($0)
+					if(lineLength > 0 && shortestIndentLength > indentLength) {
+						shortestIndentLength = indentLength
+					}
+				}END{
+					print shortestIndentLength
+				}')
+	echo "${stdin}" \
+		| sed -Ee "s|^.{${shortestIndent}}||"
+}
+
+function findDate() {
+	stdin=$(cat)
+	echo "${stdin}" \
+	    | grep -o -m 1 '[0-3][0-9]\.[0-1][0-9]\.[0-9][0-9][0-9][0-9]' \
+	    | head  -1
+}
+
+function dateToTimestamp() {
+	text=$(cat)
+	if [ -z "${text}" ];
+	then
+	    text=${1}
+	fi
+	
+	if [ -z "${text}" ];
+	then
+	    exit 0
+	fi
+	echo "${text}" \
+	    | sed -E 's|([0-3][0-9])\.([0-1][0-9])\.([0-9][0-9][0-9][0-9])|\3\2\1|'
+}
+
+function toFileName() {
+	text=$(cat)
+	if [ -z "${text}" ];
+	then
+	    text=${1}
+	fi
+	
+	if [ -z "${text}" ];
+	then
+	    exit 0
+	fi
+	
+	allowedCharacters="^A-Za-z0-9_-ÖÄÜöäü "
+	echo "${text}" \
+	    | sed 's|ß|ss|' \
+	    | sed "s|[^${allowedCharacters}]| |g" \
+	    | sed -E 's|[ ]{2,}| |g'
+}
+
+# Findet Datum und sucht nächsten Zeile mit links ausgerichteten Text
+function findSubject() {
+	stdin=$(cat)
+	# vor anrede "sehr geehrt"
+	for linienNr in {1..5}
+	do
+		potenziellerBetreff=$(echo "${stdin}" \
+			| grep -i -m 1 --before-context=${linienNr} '^\s*sehr\s*geehrt' \
+			| head -n -1 \
+			| grep -oE '^\s*[a-zA-Z].*$' \
+			| sed 's|^\s*||')
+		if [ ! -z "${potenziellerBetreff}" ];
+		then
+		    #echo "Vor Anrede Zeile ${linienNr}: ${potenziellerBetreff}"
+		    echo "${potenziellerBetreff}"
+		    break
+		fi
+	done
+}
+
+pdfFile=$1
+inhalt=$(gs -dQUIET \
+   -dBATCH \
+   -dNOPAUSE \
+   -dSIMPLE \
+   -sDEVICE=txtwrite \
+   -dFirstPage=1 \
+   -dLastPage=1 \
+   -dTextFormat=3 \
+   -dUseCropBox \
+   -o- "${pdfFile}" |
+   removeIndent)
+
+fileName=$(echo "${inhalt}" \
+	    | findSubject \
+	    | toFileName \
+	    | cut -c 1-30 \
+	    | sed 's|[ ]*$||')
+if [ -z "${fileName}" ];
+then
+    fileName="document"
+fi
+
+fileNameDate=$(echo "${inhalt}" \
+	| findDate \
+	| dateToTimestamp)
+if [ -z "${fileNameDate}" ];
+then
+    fileNameDate=$(date +%Y%m%d)
+fi
+
+echo "${fileNameDate}$(date +-%H%M%S)_${fileName}.pdf"

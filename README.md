@@ -7,6 +7,9 @@
 - processing is done in /work
 - unprocessed scannes are resumed on every start
 
+# Truenas Settings
+Find a screenshot of the settings here: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_settings.png
+
 # References
 - https://linuxconfig.org/tutorial-on-how-to-write-basic-udev-rules-in-linux
 - https://github.com/budney/docker-scanbd/blob/main/Dockerfile

@@ -13,6 +13,12 @@ TESSERACT_PARALLEL="parallel -j1 --tmpdir $tmpdir --timeout 120s --results {}.lo
 
 GS="gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf"
 
+# List files in working directory
+# -b	print C-style escapes for nongraphic characters
+# -1	list one file per line
+# -v	natural sort of (version) numbers within text
+# -X	sort alphabetically by entry extension
+LS="ls -b -1 -v -X ."
 
 _baseDir="$(realpath $(dirname $0))"
 
@@ -33,14 +39,14 @@ case $1 in
 		# Lange Erkennung abbrechen 
 		# Leere Ausgabedatei ignorieren
 		# Im Fehlerfall ohne Texterkennung weiter machen
-		ls -b -1 -v -X . | grep -i '.tiff$' | ${TESSERACT_PARALLEL} "${TESSERACT} {} {}.tmp pdf ; if [ -s '{}.tmp.pdf' ]; then mv {}.tmp.pdf {}.pdf ; fi" || true
+		${LS} | grep -i '.tiff$' | ${TESSERACT_PARALLEL} "${TESSERACT} {} {}.tmp pdf ; if [ -s '{}.tmp.pdf' ]; then mv {}.tmp.pdf {}.pdf ; fi" || true
 		
 		# Fehlerhaft Seiten als Bild konvertieren
-		ls -b -1 -v -X . | grep -i '.tiff$' | ${PARALLEL} "if [ -e '{}.tmp.pdf' ]; then rm {}.tmp.pdf ; ${IMAGEMAGICK_CONVERT} -compress Fax {} {}.pdf ; fi"
+		${LS} | grep -i '.tiff$' | ${PARALLEL} "if [ -e '{}.tmp.pdf' ]; then rm {}.tmp.pdf ; ${IMAGEMAGICK_CONVERT} -compress Fax {} {}.pdf ; fi"
 	
 		# Einzelseiten zusammenfassen
 		export TEMP=$tmpdir
-		ls -b -1 -v -X . | grep -i '.tiff.pdf$' | xargs sh -c "${GS} -sPAPERSIZE=a4 -dPDFFitPage "\$@"" gs
+		${LS} | grep -i '.tiff.pdf$' | xargs sh -c "${GS} -sPAPERSIZE=a4 -dPDFFitPage "\$@"" gs
 		# -dFIXEDMEDIA
 		
 	#	cp pages.pdf "$2/../$(date +%Y%m%d-%H%M%S)_document.pdf"
@@ -66,11 +72,11 @@ case $1 in
 		cp -r $2/* $tmpworkdir
 		cd $tmpworkdir
 		
-		ls -b -1 -v -X . | grep -i '.pnm$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} -page A4 {} {}.pdf"
+		${LS} | grep -i '.pnm$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} -page A4 {} {}.pdf"
 		
 		# Einzelseiten zusammenfassen
 		export TEMP=$tmpdir
-		ls -b -1 -v -X . | grep -i '.pnm.pdf$' | xargs sh -c "${GS} "\$@"" gs
+		${LS} | grep -i '.pnm.pdf$' | xargs sh -c "${GS} "\$@"" gs
 		cp pages.pdf "$2/../$(date +%Y%m%d-%H%M%S)_document.pdf"
 		rm -rf $2 $tmpworkdir
 		exit
@@ -83,12 +89,12 @@ case $1 in
 		cp -r $2/* $tmpworkdir
 		cd $tmpworkdir
 	
-		ls -b -1 -v -X . | grep -i '.pnm$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} -fuzz 20% -trim {}  {}.crop"
-		ls -b -1 -v -X . | grep -i '.pnm.crop$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} {} {}.pdf"
+		${LS} | grep -i '.pnm$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} -fuzz 20% -trim {}  {}.crop"
+		${LS} | grep -i '.pnm.crop$' | ${PARALLEL} "${IMAGEMAGICK_CONVERT} {} {}.pdf"
 	
 		# Einzelseiten zusammenfassen
 		export TEMP=$tmpdir
-		ls -b -1 -v -X . | grep -i '.pnm.crop.pdf$' | xargs sh -c "${GS} "\$@"" gs
+		${LS} | grep -i '.pnm.crop.pdf$' | xargs sh -c "${GS} "\$@"" gs
 		cp pages.pdf "$2/../$(date +%Y%m%d-%H%M%S)_document.pdf"
 		rm -rf $2 $tmpworkdir
 		exit

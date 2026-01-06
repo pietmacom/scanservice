@@ -32,7 +32,7 @@ Setting UID / GID is optional but recommended. You'll find the UID (GID is the s
 | scan 8 | Single-Sided Photo (color)                        | Front  | Color    | 300 | PDF        |
 | scan 9 | Single-Sided HiRes Photo (color) / Trimmed        | Front  | Color    | 600 | PDF+TRIM   |
 
-\* Modes:
+\* Modes
 - Lineart: --emphasis 0 --contrast 50 --brightness 0
 - Halftone: --ht-type Dither --ht-pattern 2
 - Gray: --emphasis 0 --contrast 20 --brightness 20

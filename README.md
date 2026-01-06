@@ -2,12 +2,13 @@
 
 Scan
 - udev and dbus are running locally in the container
-- scanbd is started and restarted by udev when the scanner is connected or turned on
+- udev starts or restarts scanbd whenever the scanner is connected or powered on
+- scanbd initiates the processing script upon detection of a button press on the scanner
 
 Processing
 - scans are processed by scripts in /script (OCR, drop empty pages, color correction, PDF creation)
-- unprocessed scans and done documents are located in /dest
-- unprocessed scans are resumed on every start from /dest
+- unprocessed scans (/dest/scan.\*) and done documents (/dest/*.pdf) are saved in /dest
+- unprocessed scans (/dest/scan.\*) are resumed on every start from /dest
 
 # Docker Compose
 Find all possible and recommended settings in the attached [docker-compose.yml](docker-compose.yml) 

@@ -18,6 +18,22 @@ Find a screenshot of the APP settings here: [truenas_settings.png](docs/truenas_
 
 Setting UID / GID is optional but recommended. You'll find the UID (GID is the same) in the users setting: [truenas_find_uid.png](docs/truenas_find_uid.png)
 
+# Toolchain
+Interfacing With Devices
+- udev
+- dbus
+- scanbd
+- saned
+
+Organization
+- task-spooler
+- parallel
+
+Processing
+- imagemagick
+- ghostscript
+- tesseract-ocr (AI)
+
 # References
 - https://linuxconfig.org/tutorial-on-how-to-write-basic-udev-rules-in-linux
 - https://github.com/budney/docker-scanbd/blob/main/Dockerfile

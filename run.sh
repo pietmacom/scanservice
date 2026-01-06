@@ -23,8 +23,8 @@ dbus-daemon --config-file=/usr/share/dbus-1/system.conf --print-address
 # udevadm trigger
 
 # PREPARE WORKER
-chmod -R 777 /dest || true
-chmod -R 777 /work || true
+chmod 777 /dest || true
+chmod 777 /work
 su -s /bin/bash -c "/script/my-resume.script" - saned
 
 # LOGS

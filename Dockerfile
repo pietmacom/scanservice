@@ -28,6 +28,7 @@ RUN apt install -y parallel \
     			   tesseract-ocr-deu \
     			   tesseract-ocr-pol
 
+ENV UID="" GID=""
 ADD ./script /script
 RUN chmod +x /script/*.script
     			       

@@ -1,5 +1,17 @@
 #!/bin/bash -ex
 
+# SET USER ID
+if [ -n "${UID}" ];
+then
+	usermod --uid ${UID} saned
+fi
+
+# SET GROUP ID
+if [ -n "${GID}" ];
+then
+	groupmod --gid ${GID} saned
+fi
+
 # UDEV ACCESSING HOSTS DBUS
 DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket unshare --net /lib/systemd/systemd-udevd --daemon 
 
@@ -11,8 +23,8 @@ dbus-daemon --config-file=/usr/share/dbus-1/system.conf --print-address
 # udevadm trigger
 
 # PREPARE WORKER
-chmod -R 777 /dest
-chmod -R 777 /work
+chmod -R 777 /dest || true
+chmod -R 777 /work || true
 su -s /bin/bash -c "/script/my-resume.script" - saned
 
 # LOGS

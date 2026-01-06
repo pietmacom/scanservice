@@ -6,7 +6,11 @@ services:
       network: host
     privileged: true
     volumes:
-#       - /dest:/dest
+       - /dest:./scanned
        - /run/dbus:/host/run/dbus
        - /dev/bus/usb:/dev/bus/usb
+    environment:
+       UID: 3000
+       GID: 3000
+
        

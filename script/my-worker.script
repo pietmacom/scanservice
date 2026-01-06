@@ -25,6 +25,9 @@ _baseDir="$(realpath $(dirname $0))"
 tmpworkdir=$tmpdir/$(basename $2)
 mkdir -p $tmpworkdir
 
+# -- Notes
+# swdeskew - Führt zu abgeschnittenen seiten
+
 # WORKER
 # cleanup : rm lept* *.tiff.* magic*
 case $1 in

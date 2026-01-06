@@ -1,14 +1,17 @@
 # Scanservice
 
+Scan
 - udev and dbus are running locally in the container
 - scanbd is started and restarted by udev when the scanner is connected or turned on
+
+Processing
 - scans are processed by scripts (OCR, drop empty pages, color correction, PDF creation)
-- done documents and unprocessed scans are located in /dest
-- processing is done in /work
-- unprocessed scannes are resumed on every start
+- unprocessed scans and done documents are located in /dest
+- unprocessed scans are resumed on every start
 
 # Truenas Settings
-Find a screenshot of the settings here: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_settings.png
+Find a screenshot of the APP settings here: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_settings.png
+Setting UID / GID is optional but recommended. You'll find the UID (GID is the same) in the users setting: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_find_uid.png
 
 # References
 - https://linuxconfig.org/tutorial-on-how-to-write-basic-udev-rules-in-linux

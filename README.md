@@ -6,7 +6,7 @@ Scan
 - scanbd initiates the processing script upon detection of a button press on the scanner
 
 Processing
-- scans are processed by scripts in /script (OCR, drop empty pages, color correction, PDF creation)
+- scans are processed by scripts in /script (drop empty pages, color correction, OCR, PDF creation)
 - unprocessed scans (/dest/scan.\*) and done documents (/dest/*.pdf) are saved in /dest
 - unprocessed scans (/dest/scan.\*) are resumed on every start from /dest
 

@@ -5,9 +5,9 @@ Scan
 - scanbd is started and restarted by udev when the scanner is connected or turned on
 
 Processing
-- scans are processed by scripts (OCR, drop empty pages, color correction, PDF creation)
+- scans are processed by scripts in /script (OCR, drop empty pages, color correction, PDF creation)
 - unprocessed scans and done documents are located in /dest
-- unprocessed scans are resumed on every start
+- unprocessed scans are resumed on every start from /dest
 
 # Truenas Settings
 Find a screenshot of the APP settings here: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_settings.png

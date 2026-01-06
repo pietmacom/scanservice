@@ -32,7 +32,7 @@ Organization
 Processing
 - imagemagick
 - ghostscript
-- tesseract-ocr (AI)
+- tesseract (AI)
 
 # References
 - https://linuxconfig.org/tutorial-on-how-to-write-basic-udev-rules-in-linux

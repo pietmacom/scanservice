@@ -20,133 +20,145 @@ result=0
 cd $workspace
 /usr/bin/printenv > script.env
 
+## SCANIMAGE
+#
 # BASE
 SCANIMAGE="scanimage --device-name="$SCANBD_DEVICE""
 
-# WITH FUJI BACKEND
+# +BACKEND
 SCANIMAGE="${SCANIMAGE} --df-action=Stop --swskip 3 --buffermode On --page-width 210 --page-height 297.1 -l 0 -t 0 --ald=yes"
 
-# BASE
-SCANIMAGE_TIFF="${SCANIMAGE} --batch=./page_%04d.tiff --format=tiff"
-SCANIMAGE_PNM="${SCANIMAGE} --batch=./page_%04d.pnm --format=pnm"
+# OPTIONS
+SI_SOURCE_DUPLEX="--source "ADF Duplex""
+SI_SOURCE_FRONT="--source "ADF Front""
 
-# WITH FUJI BACKEND
-SCANIMAGE_TIFF_DUPLEX="${SCANIMAGE_TIFF} --source "ADF Duplex""
-SCANIMAGE_PNM_DUPLEX="${SCANIMAGE_PNM} --source "ADF Duplex""
-SCANIMAGE_TIFF_FRONT="${SCANIMAGE_TIFF} --source "ADF Front""
-SCANIMAGE_PNM_FRONT="${SCANIMAGE_PNM} --source "ADF Front""
+SI_FORMAT_TIFF="--format=tiff --batch=./page_%04d.tiff"
+SI_FORMAT_PNM="--format=pnm --batch=./page_%04d.pnm"
 
-# -- Notes
-# swdeskew - Führt zu abgeschnittenen seiten
+SI_MODE_COLOR="--mode Color --emphasis 0 --contrast 35 --brightness 35"
+SI_MODE_GRAY="--mode Gray --emphasis 0 --contrast 20 --brightness 20"
+SI_MODE_LINEART="--mode Lineart --emphasis 0 --contrast 50 --brightness 0"
+SI_MODE_HALFTIONE="--mode Halftone --ht-type Dither --ht-pattern 2"
 
 echo "scanbd: $0 Begin of $SCANBD_ACTION for device $SCANBD_DEVICE"
 case $SCANBD_ACTION in
 "scan")
 	case $SCANBD_FUNCTION in
 	    1)
-		echo "Lineart - Duplex - OCR"
-		${SCANIMAGE_TIFF_DUPLEX} \
-		--mode Lineart \
-		--resolution 300 \
-		--emphasis 0 \
-		--contrast 50 \
-		--brightness 0 \
-		|| result=$?
-		worker="tiffToPdf+ocr"
+			echo "Duplex, Lineart, PDF (OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_DUPLEX} \
+			${SI_FORMAT_TIFF} \
+			${SI_MODE_LINEART} \
+			--resolution 300 \
+			|| result=$?
+			
+			worker="tiffToPdf+ocr"
 		;;
 		
 	    2)
-		echo "Halftone - Duplex - OCR"
-		${SCANIMAGE_TIFF_DUPLEX} \
-		--mode Halftone \
-		--ht-type Dither \
-		--ht-pattern 2 \
-		--resolution 300 \
-		|| result=$?
-		worker="tiffToPdf+ocr"
+			echo "Duplex, Halftone, PDF (OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_DUPLEX} \
+			${SI_FORMAT_TIFF} \
+			${SI_MODE_HALFTIONE} \
+			--resolution 300 \
+			|| result=$?
+			
+			worker="tiffToPdf+ocr"
 		;;
 
 	    3)
-		echo "Gray - Duplex"
-		${SCANIMAGE_PNM_DUPLEX} \
-		--mode Gray \
-		--resolution 300 \
-		--emphasis 0 \
-		--contrast 20 \
-		--brightness 20 \
-		|| result=$?
-		worker="pnmToPdf"
+			echo "Duplex, Gray, PDF (no OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_DUPLEX} \
+			${SI_FORMAT_PNM} \
+			${SI_MODE_GRAY} \
+			--resolution 300 \
+			|| result=$?
+			
+			worker="pnmToPdf"
 		;;
 		
 	    4)
-		echo "Color - Duplex"
-		${SCANIMAGE_TIFF_DUPLEX} \
-		--mode Color \
-		--resolution 150 \
-		--emphasis 0 \
-		--contrast 35 \
-		--brightness 35 \
-		|| result=$?
-		worker="tiffToPdf+ocr"
+			echo "Duplex, Color, PDF (no OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_DUPLEX} \
+			${SI_FORMAT_TIFF} \
+			${SI_MODE_COLOR} \
+			--resolution 150 \
+			|| result=$?
+			
+			worker="tiffToPdf+ocr"
 		;;
 
 	    5)
-		echo "Lineart - Uniplex - OCR"
-		${SCANIMAGE_TIFF_FRONT} \
-		--mode Lineart \
-		--resolution 300 \
-		--emphasis 0 \
-		--contrast 50 \
-		--brightness 0 \
-		|| result=$?
-		worker="tiffToPdf+ocr"
+			echo "Front, Lineart, PDF (no OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_FRONT} \
+			${SI_FORMAT_TIFF} \
+			${SI_MODE_LINEART} \			
+			--resolution 300 \
+			|| result=$?
+			
+			worker="tiffToPdf+ocr"
 		;;
 
 	    6)
-		echo "Halftone - Uniplex - OCR"
-		${SCANIMAGE_TIFF_FRONT} \
-		--mode Halftone \
-		--ht-type Dither \
-		--ht-pattern 2 \
-		--resolution 300 \
-		|| result=$?
-		worker="tiffToPdf+ocr"
+			echo "Front, Halftone, PDF (OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_FRONT} \
+			${SI_FORMAT_TIFF} \
+			${SI_MODE_HALFTONE} \	
+			--resolution 300 \
+			|| result=$?
+			
+			worker="tiffToPdf+ocr"
 		;;
 
 	    7)
-		echo "Gray - Uniplex"
-		${SCANIMAGE_PNM_FRONT} \
-		--mode Gray \
-		--resolution 300 \
-		--emphasis 0 \
-		--contrast 20 \
-		--brightness 20 \
-		|| result=$?
-		worker="pnmToPdf"
+			echo "Front, Gray, PDF (no OCR)"
+
+			${SCANIMAGE} \
+			${SI_SOURCE_FRONT} \
+			${SI_FORMAT_PNM} \
+			${SI_MODE_GRAY} \
+			--resolution 300 \
+			|| result=$?
+			
+			worker="pnmToPdf"
 		;;
 		
 	    8)
-		echo "Color - Uniplex"
-		${SCANIMAGE_PNM_FRONT} \
-		--mode Color \
-		--resolution 300 \
-		--emphasis 0 \
-		--contrast 35 \
-		--brightness 35 \
-		|| result=$?
-		worker="pnmToPdf"
+			echo "Front, Color, PDF (no OCR)"
+			
+			${SCANIMAGE} \
+			${SI_SOURCE_FRONT} \
+			${SI_FORMAT_PNM} \
+			${SI_MODE_COLOR} \
+			--resolution 300 \
+			|| result=$?
+			
+			worker="pnmToPdf"
 		;;
 
 	    9)
-		echo "Color - Uniplex - Trim"
-		${SCANIMAGE_PNM_FRONT} \
-		--mode Color \
-		--resolution 600 \
-		--emphasis 0 \
-		--contrast 35 \
-		--brightness 35 \
-		|| result=$?
-		worker="pnmToPdf+trim"
+			echo "Front, Color, PDF (no OCR) trimmed"
+	
+			${SCANIMAGE} \
+			${SI_SOURCE_FRONT} \
+			${SI_FORMAT_PNM} \
+			${SI_MODE_COLOR} \
+			--resolution 600 \
+			|| result=$?
+			
+			worker="pnmToPdf+trim"
 		;;
 	esac
 	;;

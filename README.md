@@ -11,6 +11,7 @@ Processing
 
 # Truenas Settings
 Find a screenshot of the APP settings here: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_settings.png
+
 Setting UID / GID is optional but recommended. You'll find the UID (GID is the same) in the users setting: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_find_uid.png
 
 # References

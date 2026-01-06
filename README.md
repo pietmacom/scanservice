@@ -9,6 +9,9 @@ Processing
 - unprocessed scans and done documents are located in /dest
 - unprocessed scans are resumed on every start from /dest
 
+# Docker Compose
+Find all possible and recommended settings in the attached docker-compose.yml 
+
 # Truenas Settings
 Find a screenshot of the APP settings here: https://github.com/pietmacom/scanservice/blob/main/docs/truenas_settings.png
 

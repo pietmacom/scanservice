@@ -1,13 +1,6 @@
 #!/bin/bash -ex
 
-destination="/dest"
-workspace="$(mktemp -d ${destination}/scan.XXXXXXXXXX)"
-worker=""
-result=0
-
-# -- Notes
-# swdeskew - Führt zu abgeschnittenen seiten
-#
+## Environment from SCANBD
 # SCANBD_ACTION=scan
 # USER=nobody
 # SCANBD_FUNCTION=3
@@ -19,236 +12,136 @@ result=0
 # PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 # _=/usr/bin/printenv
 
-echo "scanbd: $0 Begin of $SCANBD_ACTION for device $SCANBD_DEVICE"
+destination="/dest"
+workspace="$(mktemp -d ${destination}/scan.XXXXXXXXXX)"
+worker=""
+result=0
 
 cd $workspace
 /usr/bin/printenv > script.env
 
+# BASE
+SCANIMAGE="scanimage --device-name="$SCANBD_DEVICE""
+
+# WITH FUJI BACKEND
+SCANIMAGE="${SCANIMAGE} --df-action=Stop --swskip 3 --buffermode On --page-width 210 --page-height 297.1 -l 0 -t 0 --ald=yes"
+
+# BASE
+SCANIMAGE_TIFF="${SCANIMAGE} --batch=./page_%04d.tiff --format=tiff"
+SCANIMAGE_PNM="${SCANIMAGE} --batch=./page_%04d.pnm --format=pnm"
+
+# WITH FUJI BACKEND
+SCANIMAGE_TIFF_DUPLEX="${SCANIMAGE_TIFF} --source "ADF Duplex""
+SCANIMAGE_PNM_DUPLEX="${SCANIMAGE_PNM} --source "ADF Duplex""
+SCANIMAGE_TIFF_FRONT="${SCANIMAGE_TIFF} --source "ADF Front""
+SCANIMAGE_PNM_FRONT="${SCANIMAGE_PNM} --source "ADF Front""
+
+# -- Notes
+# swdeskew - Führt zu abgeschnittenen seiten
+
+echo "scanbd: $0 Begin of $SCANBD_ACTION for device $SCANBD_DEVICE"
 case $SCANBD_ACTION in
 "scan")
 	case $SCANBD_FUNCTION in
 	    1)
 		echo "Lineart - Duplex - OCR"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Duplex" \
+		${SCANIMAGE_TIFF_DUPLEX} \
 		--mode Lineart \
 		--resolution 300 \
-		--batch=./page_%04d.tiff \
-		--format=tiff \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes  \
 		--emphasis 0 \
 		--contrast 50 \
 		--brightness 0 \
 		|| result=$?
 		worker="tiffToPdf+ocr"
 		;;
+		
 	    2)
 		echo "Halftone - Duplex - OCR"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Duplex" \
+		${SCANIMAGE_TIFF_DUPLEX} \
 		--mode Halftone \
 		--ht-type Dither \
 		--ht-pattern 2 \
 		--resolution 300 \
-		--batch=./page_%04d.tiff \
-		--format=tiff \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		|| result=$?
 		worker="tiffToPdf+ocr"
 		;;
+
 	    3)
 		echo "Gray - Duplex"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Duplex" \
+		${SCANIMAGE_PNM_DUPLEX} \
 		--mode Gray \
 		--resolution 300 \
-		--batch=./page_%04d.pnm \
-		--format=pnm \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		--emphasis 0 \
 		--contrast 20 \
 		--brightness 20 \
 		|| result=$?
 		worker="pnmToPdf"
 		;;
+		
 	    4)
 		echo "Color - Duplex"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Duplex" \
+		${SCANIMAGE_TIFF_DUPLEX} \
 		--mode Color \
 		--resolution 150 \
-		--batch=./page_%04d.tiff \
-		--format=pnm \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		--emphasis 0 \
 		--contrast 35 \
 		--brightness 35 \
 		|| result=$?
 		worker="tiffToPdf+ocr"
 		;;
-#	    4)
-#		echo "Color - Duplex"
-#		scanimage \
-#		-d "$SCANBD_DEVICE" \
-#		--source "ADF Duplex" \
-#		--mode Color \
-#		--resolution 300 \
-#		--batch=./page_%04d.pnm \
-#		--format=pnm \
-#		--df-action=Stop \
-#		--swskip 3 \
-#		--buffermode On \
-#		--page-width 210 \
-#		--page-height 297.1 \
-#		-l 0 \
-#		-t 0 \
-#		--ald=yes \
-#		--emphasis 0 \
-#		--contrast 35 \
-#		--brightness 35 \
-#		|| result=$?
-#		worker="pnmToPdf"
-#		;;
+
 	    5)
 		echo "Lineart - Uniplex - OCR"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Front" \
+		${SCANIMAGE_TIFF_FRONT} \
 		--mode Lineart \
 		--resolution 300 \
-		--batch=./page_%04d.tiff \
-		--format=tiff \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		--emphasis 0 \
 		--contrast 50 \
 		--brightness 0 \
 		|| result=$?
 		worker="tiffToPdf+ocr"
 		;;
+
 	    6)
 		echo "Halftone - Uniplex - OCR"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Front" \
+		${SCANIMAGE_TIFF_FRONT} \
 		--mode Halftone \
 		--ht-type Dither \
 		--ht-pattern 2 \
 		--resolution 300 \
-		--batch=./page_%04d.tiff \
-		--format=tiff \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On  \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		|| result=$?
 		worker="tiffToPdf+ocr"
 		;;
+
 	    7)
 		echo "Gray - Uniplex"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Front" \
+		${SCANIMAGE_PNM_FRONT} \
 		--mode Gray \
 		--resolution 300 \
-		--batch=./page_%04d.pnm \
-		--format=pnm \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		--emphasis 0 \
 		--contrast 20 \
 		--brightness 20 \
 		|| result=$?
 		worker="pnmToPdf"
 		;;
+		
 	    8)
 		echo "Color - Uniplex"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Front" \
+		${SCANIMAGE_PNM_FRONT} \
 		--mode Color \
 		--resolution 300 \
-		--batch=./page_%04d.pnm \
-		--format=pnm \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		--emphasis 0 \
 		--contrast 35 \
 		--brightness 35 \
 		|| result=$?
 		worker="pnmToPdf"
 		;;
+
 	    9)
 		echo "Color - Uniplex - Trim"
-		scanimage \
-		-d "$SCANBD_DEVICE" \
-		--source "ADF Front" \
+		${SCANIMAGE_PNM_FRONT} \
 		--mode Color \
 		--resolution 600 \
-		--batch=./page_%04d.pnm \
-		--format=pnm \
-		--df-action=Stop \
-		--swskip 3 \
-		--buffermode On \
-		--page-width 210 \
-		--page-height 297.1 \
-		-l 0 \
-		-t 0 \
-		--ald=yes \
 		--emphasis 0 \
 		--contrast 35 \
 		--brightness 35 \
@@ -257,6 +150,7 @@ case $SCANBD_ACTION in
 		;;
 	esac
 	;;
+
 "email")
 	case $SCANBD_FUNCTION in
 	    1)
@@ -281,6 +175,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf+ocr"
 		;;
+		
 	    2)
 		echo "Halftone - Duplex - OCR"
 		scanimage \
@@ -303,6 +198,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf+ocr"
 		;;
+		
 	    3)
 		echo "Gray - Duplex"
 		scanimage \
@@ -326,6 +222,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf"
 		;;
+		
 	    4)
 		echo "Color - Duplex"
 		scanimage \
@@ -349,6 +246,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf+ocr"
 		;;
+		
 	    5)
 		echo "Lineart - Uniplex - OCR"
 		scanimage \
@@ -372,6 +270,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf+ocr"
 		;;
+		
 	    6)
 		echo "Halftone - Uniplex - OCR"
 		scanimage \
@@ -394,6 +293,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf+ocr"
 		;;
+		
 	    7)
 		echo "Gray - Uniplex"
 		scanimage \
@@ -417,6 +317,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf"
 		;;
+		
 	    8)
 		echo "Color - Uniplex"
 		scanimage \
@@ -440,6 +341,7 @@ case $SCANBD_ACTION in
 		|| result=$?
 		worker="pdf"
 		;;
+		
 	    9)
 		echo "Color - Uniplex - Trim"
 		scanimage \

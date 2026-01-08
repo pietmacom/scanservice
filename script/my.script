@@ -45,132 +45,131 @@ SI_MODE_HALFTIONE="--mode=Halftone --ht-type=Dither --ht-pattern=2"
 
 echo "scanbd: $0 Begin of $SCANBD_ACTION for device $SCANBD_DEVICE"
 case $SCANBD_ACTION in
-"scan")
-	case $SCANBD_FUNCTION in
-	    1)
-			echo "Duplex, Lineart, PDF (OCR)"
+	"scan")
+		case $SCANBD_FUNCTION in
+		    1)
+				echo "Duplex, Lineart, PDF (OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_DUPLEX} \
+				${SI_FORMAT_TIFF} \
+				${SI_MODE_LINEART} \
+				--resolution 300 \
+				|| result=$?
+				
+				worker="tiffToPdf+ocr"
+			;;
 			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_DUPLEX} \
-			${SI_FORMAT_TIFF} \
-			${SI_MODE_LINEART} \
-			--resolution 300 \
-			|| result=$?
-			
-			worker="tiffToPdf+ocr"
-		;;
-		
-	    2)
-			echo "Duplex, Halftone, PDF (OCR)"
-			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_DUPLEX} \
-			${SI_FORMAT_TIFF} \
-			${SI_MODE_HALFTIONE} \
-			--resolution 300 \
-			|| result=$?
-			
-			worker="tiffToPdf+ocr"
-		;;
-
-	    3)
-			echo "Duplex, Gray, PDF (no OCR)"
-			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_DUPLEX} \
-			${SI_FORMAT_PNM} \
-			${SI_MODE_GRAY} \
-			--resolution 300 \
-			|| result=$?
-			
-			worker="pnmToPdf"
-		;;
-		
-	    4)
-			echo "Duplex, Color, PDF (no OCR)"
-			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_DUPLEX} \
-			${SI_FORMAT_TIFF} \
-			${SI_MODE_COLOR} \
-			--resolution 150 \
-			|| result=$?
-			
-			worker="tiffToPdf+ocr"
-		;;
-
-	    5)
-			echo "Front, Lineart, PDF (no OCR)"
-			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_FRONT} \
-			${SI_FORMAT_TIFF} \
-			${SI_MODE_LINEART} \			
-			--resolution 300 \
-			|| result=$?
-			
-			worker="tiffToPdf+ocr"
-		;;
-
-	    6)
-			echo "Front, Halftone, PDF (OCR)"
-			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_FRONT} \
-			${SI_FORMAT_TIFF} \
-			${SI_MODE_HALFTONE} \	
-			--resolution 300 \
-			|| result=$?
-			
-			worker="tiffToPdf+ocr"
-		;;
-
-	    7)
-			echo "Front, Gray, PDF (no OCR)"
-
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_FRONT} \
-			${SI_FORMAT_PNM} \
-			${SI_MODE_GRAY} \
-			--resolution 300 \
-			|| result=$?
-			
-			worker="pnmToPdf"
-		;;
-		
-	    8)
-			echo "Front, Color, PDF (no OCR)"
-			
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_FRONT} \
-			${SI_FORMAT_PNM} \
-			${SI_MODE_COLOR} \
-			--resolution 300 \
-			|| result=$?
-			
-			worker="pnmToPdf"
-		;;
-
-	    9)
-			echo "Front, Color, PDF (no OCR) trimmed"
+		    2)
+				echo "Duplex, Halftone, PDF (OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_DUPLEX} \
+				${SI_FORMAT_TIFF} \
+				${SI_MODE_HALFTIONE} \
+				--resolution 300 \
+				|| result=$?
+				
+				worker="tiffToPdf+ocr"
+			;;
 	
-			eval ${SCANIMAGE} \
-			${SI_SOURCE_FRONT} \
-			${SI_FORMAT_PNM} \
-			${SI_MODE_COLOR} \
-			--resolution 600 \
-			|| result=$?
+		    3)
+				echo "Duplex, Gray, PDF (no OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_DUPLEX} \
+				${SI_FORMAT_PNM} \
+				${SI_MODE_GRAY} \
+				--resolution 300 \
+				|| result=$?
+				
+				worker="pnmToPdf"
+			;;
 			
-			worker="pnmToPdf+trim"
-		;;
-
+		    4)
+				echo "Duplex, Color, PDF (no OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_DUPLEX} \
+				${SI_FORMAT_TIFF} \
+				${SI_MODE_COLOR} \
+				--resolution 150 \
+				|| result=$?
+				
+				worker="tiffToPdf+ocr"
+			;;
+	
+		    5)
+				echo "Front, Lineart, PDF (no OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_FRONT} \
+				${SI_FORMAT_TIFF} \
+				${SI_MODE_LINEART} \			
+				--resolution 300 \
+				|| result=$?
+				
+				worker="tiffToPdf+ocr"
+			;;
+	
+		    6)
+				echo "Front, Halftone, PDF (OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_FRONT} \
+				${SI_FORMAT_TIFF} \
+				${SI_MODE_HALFTONE} \	
+				--resolution 300 \
+				|| result=$?
+				
+				worker="tiffToPdf+ocr"
+			;;
+	
+		    7)
+				echo "Front, Gray, PDF (no OCR)"
+	
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_FRONT} \
+				${SI_FORMAT_PNM} \
+				${SI_MODE_GRAY} \
+				--resolution 300 \
+				|| result=$?
+				
+				worker="pnmToPdf"
+			;;
+			
+		    8)
+				echo "Front, Color, PDF (no OCR)"
+				
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_FRONT} \
+				${SI_FORMAT_PNM} \
+				${SI_MODE_COLOR} \
+				--resolution 300 \
+				|| result=$?
+				
+				worker="pnmToPdf"
+			;;
+	
+		    9)
+				echo "Front, Color, PDF (no OCR) trimmed"
+		
+				eval ${SCANIMAGE} \
+				${SI_SOURCE_FRONT} \
+				${SI_FORMAT_PNM} \
+				${SI_MODE_COLOR} \
+				--resolution 600 \
+				|| result=$?
+				
+				worker="pnmToPdf+trim"
+			;;
 		esac
-		;;
+	;;
 
-"email")
-	case $SCANBD_FUNCTION in
+	"email")
+		case $SCANBD_FUNCTION in
 		esac
-		;;
+	;;
 esac
 
 if [ ! $result -eq 0 ];

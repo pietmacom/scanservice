@@ -16,7 +16,7 @@ RUN echo "net" > /etc/sane.d/dll.conf && \
     sed -i 's|# localhost|localhost|' /etc/sane.d/net.conf
 
 ADD ./scanbd /etc/scanbd/
-ADD 99-scanbd.rules /usr/lib/udev/rules.d/
+ADD ./udev/rules.d/99-scanbd.rules /usr/lib/udev/rules.d/
 
 # WORKER    
 RUN apt install -y parallel \

@@ -6,9 +6,9 @@ services:
       network: host
     privileged: true
     volumes:
-#       - /mnt/pool1/shares/scan:/dest
        - /run/dbus:/host/run/dbus
        - /dev/bus/usb:/dev/bus/usb
+#       - /mnt/pool1/shares/scan:/dest
     environment:
        UID: 3000
        GID: 3000

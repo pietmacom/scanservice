@@ -1,11 +1,9 @@
 #!/bin/bash -ex
-tmpdir=/work
+
 _baseDir="$(realpath $(dirname $0))"
+tmpdir=/work
 tmpworkdir=$tmpdir/$(basename $2)
 mkdir -p $tmpworkdir
-
-## WORKER
-#
 
 # List files in working directory
 # -b	print C-style escapes for nongraphic characters

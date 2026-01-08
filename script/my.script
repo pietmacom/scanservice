@@ -23,14 +23,14 @@ cd $workspace
 ## SCANIMAGE
 #
 # BASE
-SCANIMAGE="scanimage --device-name="$SCANBD_DEVICE""
+SCANIMAGE="scanimage --device-name=\"$SCANBD_DEVICE\""
 
 # +BACKEND
 SCANIMAGE="${SCANIMAGE} --df-action=Stop --swskip 3 --buffermode On --page-width 210 --page-height 297.1 -l 0 -t 0 --ald=yes"
 
 # OPTIONS
-SI_SOURCE_DUPLEX="--source "ADF Duplex""
-SI_SOURCE_FRONT="--source "ADF Front""
+SI_SOURCE_DUPLEX="--source \"ADF Duplex\""
+SI_SOURCE_FRONT="--source \"ADF Front\""
 
 SI_FORMAT_TIFF="--format=tiff --batch=./page_%04d.tiff"
 SI_FORMAT_PNM="--format=pnm --batch=./page_%04d.pnm"
@@ -47,7 +47,7 @@ case $SCANBD_ACTION in
 	    1)
 			echo "Duplex, Lineart, PDF (OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_DUPLEX} \
 			${SI_FORMAT_TIFF} \
 			${SI_MODE_LINEART} \
@@ -60,7 +60,7 @@ case $SCANBD_ACTION in
 	    2)
 			echo "Duplex, Halftone, PDF (OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_DUPLEX} \
 			${SI_FORMAT_TIFF} \
 			${SI_MODE_HALFTIONE} \
@@ -73,7 +73,7 @@ case $SCANBD_ACTION in
 	    3)
 			echo "Duplex, Gray, PDF (no OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_DUPLEX} \
 			${SI_FORMAT_PNM} \
 			${SI_MODE_GRAY} \
@@ -86,7 +86,7 @@ case $SCANBD_ACTION in
 	    4)
 			echo "Duplex, Color, PDF (no OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_DUPLEX} \
 			${SI_FORMAT_TIFF} \
 			${SI_MODE_COLOR} \
@@ -99,7 +99,7 @@ case $SCANBD_ACTION in
 	    5)
 			echo "Front, Lineart, PDF (no OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_FRONT} \
 			${SI_FORMAT_TIFF} \
 			${SI_MODE_LINEART} \			
@@ -112,7 +112,7 @@ case $SCANBD_ACTION in
 	    6)
 			echo "Front, Halftone, PDF (OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_FRONT} \
 			${SI_FORMAT_TIFF} \
 			${SI_MODE_HALFTONE} \	
@@ -125,7 +125,7 @@ case $SCANBD_ACTION in
 	    7)
 			echo "Front, Gray, PDF (no OCR)"
 
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_FRONT} \
 			${SI_FORMAT_PNM} \
 			${SI_MODE_GRAY} \
@@ -138,7 +138,7 @@ case $SCANBD_ACTION in
 	    8)
 			echo "Front, Color, PDF (no OCR)"
 			
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_FRONT} \
 			${SI_FORMAT_PNM} \
 			${SI_MODE_COLOR} \
@@ -151,7 +151,7 @@ case $SCANBD_ACTION in
 	    9)
 			echo "Front, Color, PDF (no OCR) trimmed"
 	
-			${SCANIMAGE} \
+			eval ${SCANIMAGE} \
 			${SI_SOURCE_FRONT} \
 			${SI_FORMAT_PNM} \
 			${SI_MODE_COLOR} \

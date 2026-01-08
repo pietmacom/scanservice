@@ -22,6 +22,9 @@ cd $workspace
 
 ## SCANIMAGE
 #
+# Notes
+# --swdeskew - Führt zu abgeschnittenen seiten
+#
 # BASE
 SCANIMAGE="scanimage --device-name=\"$SCANBD_DEVICE\""
 

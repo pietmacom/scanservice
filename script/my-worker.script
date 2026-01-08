@@ -1,17 +1,11 @@
 #!/bin/bash -ex
 tmpdir=/work
+_baseDir="$(realpath $(dirname $0))"
+tmpworkdir=$tmpdir/$(basename $2)
+mkdir -p $tmpworkdir
 
-PARALLEL="parallel --tmpdir $tmpdir --results {}.log --halt now,fail=1"
-
-IMAGEMAGICK_LIMIT_MEMORY="1024MiB"
-IMAGEMAGICK_LIMIT_MAP="4096MiB"
-IMAGEMAGICK_CONVERT="convert -limit memory ${IMAGEMAGICK_LIMIT_MEMORY} -limit map ${IMAGEMAGICK_LIMIT_MAP}"
-
-TESSERACT_LANGUAGE="deu"
-TESSERACT="tesseract -l ${TESSERACT_LANGUAGE} --psm 1 --oem 3"
-TESSERACT_PARALLEL="parallel -j1 --tmpdir $tmpdir --timeout 120s --results {}.log --halt never"
-
-GS="gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf"
+## WORKER
+#
 
 # List files in working directory
 # -b	print C-style escapes for nongraphic characters
@@ -20,15 +14,18 @@ GS="gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFi
 # -X	sort alphabetically by entry extension
 LS="ls -b -1 -v -X ."
 
-_baseDir="$(realpath $(dirname $0))"
+PARALLEL="parallel --tmpdir $tmpdir --results {}.log --halt now,fail=1"
 
-tmpworkdir=$tmpdir/$(basename $2)
-mkdir -p $tmpworkdir
+TESSERACT_LANGUAGE="deu"
+TESSERACT="tesseract -l ${TESSERACT_LANGUAGE} --psm 1 --oem 3"
+TESSERACT_PARALLEL="parallel -j1 --tmpdir $tmpdir --timeout 120s --results {}.log --halt never"
 
-# -- Notes
-# swdeskew - Führt zu abgeschnittenen seiten
+IMAGEMAGICK_LIMIT_MEMORY="1024MiB"
+IMAGEMAGICK_LIMIT_MAP="4096MiB"
+IMAGEMAGICK_CONVERT="convert -limit memory ${IMAGEMAGICK_LIMIT_MEMORY} -limit map ${IMAGEMAGICK_LIMIT_MAP}"
 
-# WORKER
+GS="gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf"
+
 # cleanup : rm lept* *.tiff.* magic*
 case $1 in
     tiffToPdf+ocr)
@@ -65,11 +62,11 @@ case $1 in
 		PARALLEL="${PARALLEL} -j${PARALLEL_JOBS}"
 	
 		# Erst das Bild rotiere, pdf erstellen, pdf rotieren
-	#	ls -b -1 -v -X *.pnm | parallel -j$jobs "convert -fuzz 20% -trim {} {}.crop"
-	#	ls -b -1 -v -X *.pnm.crop | parallel -j$jobs "convert {} -rotate 180 {}.rot"
-	#	ls -b -1 -v -X *.pnm.crop.rot | parallel -j$jobs "convert {} -page A4 {}.pdf"
-	#	ls -b -1 -v -X *.pnm.crop.rot.pdf | parallel -j$jobs "convert {} -rotate 180 {}.rot.pdf"
-	#	ls -b -1 -v -X *.pnm.crop.rot.pdf.rot.pdf | xargs sh -c 'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf  "$@"' gs
+		#	ls -b -1 -v -X *.pnm | parallel -j$jobs "convert -fuzz 20% -trim {} {}.crop"
+		#	ls -b -1 -v -X *.pnm.crop | parallel -j$jobs "convert {} -rotate 180 {}.rot"
+		#	ls -b -1 -v -X *.pnm.crop.rot | parallel -j$jobs "convert {} -page A4 {}.pdf"
+		#	ls -b -1 -v -X *.pnm.crop.rot.pdf | parallel -j$jobs "convert {} -rotate 180 {}.rot.pdf"
+		#	ls -b -1 -v -X *.pnm.crop.rot.pdf.rot.pdf | xargs sh -c 'gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=pages.pdf  "$@"' gs
 	
 		# TODO convert richtet am unterem rand aus
 		cp -r $2/* $tmpworkdir
@@ -103,4 +100,3 @@ case $1 in
 		exit
 		;;
 esac
-

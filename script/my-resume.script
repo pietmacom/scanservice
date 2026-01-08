@@ -15,9 +15,6 @@ do
     echo "resume: ${workspace} Begin of $SCANBD_ACTION for device $SCANBD_DEVICE"
     find ${workspace} -maxdepth 1 -type f -not -name '*.tiff' -not -name '*.pnm' -not -name '*.env' -exec rm -vf {} \;
 
-    # -- Notes
-    # swdeskew - Führt zu abgeschnittenen seiten
-    #
     # SCANBD_ACTION=scan
     # USER=nobody
     # SCANBD_FUNCTION=3
@@ -31,86 +28,50 @@ do
 
     worker=""
     case $SCANBD_ACTION in
-    "scan")
-	    case $SCANBD_FUNCTION in
-			1)
-			echo "Lineart - Duplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			2)
-			echo "Halftone - Duplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			3)
-			echo "Gray - Duplex"
-			worker="pnmToPdf"
-			;;
-			4)
-			echo "Color - Duplex"
-			worker="tiffToPdf+ocr"
-			;;
-			5)
-			echo "Lineart - Uniplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			6)
-			echo "Halftone - Uniplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			7)
-			echo "Gray - Uniplex"
-			worker="pdf"
-			;;
-			8)
-			echo "Color - Uniplex"
-			worker="pnmToPdf"
-			;;
-			9)
-			echo "Color - Uniplex - Trim"
-			worker="pnmToPdf+trim"
-			;;
-	    esac
-    ;;
-    "email")
-	    case $SCANBD_FUNCTION in
-			1)
-			echo "Lineart - Duplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			2)
-			echo "Halftone - Duplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			3)
-			echo "Gray - Duplex"
-			worker="pnmToPdf"
-			;;
-			4)
-			echo "Color - Duplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			5)
-			echo "Lineart - Uniplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			6)
-			echo "Halftone - Uniplex - OCR"
-			worker="tiffToPdf+ocr"
-			;;
-			7)
-			echo "Gray - Uniplex"
-			worker="pnmToPdf"
-			;;
-			8)
-			echo "Color - Uniplex"
-			worker="pnmToPdf"
-			;;
-			9)
-			echo "Color - Uniplex - Trim"
-			worker="tiffToPdf+trim"
-			;;
-	    esac
-	;;
+	    "scan")
+		    case $SCANBD_FUNCTION in
+				1)
+				echo "Lineart - Duplex - OCR"
+				worker="tiffToPdf+ocr"
+				;;
+				2)
+				echo "Halftone - Duplex - OCR"
+				worker="tiffToPdf+ocr"
+				;;
+				3)
+				echo "Gray - Duplex"
+				worker="pnmToPdf"
+				;;
+				4)
+				echo "Color - Duplex"
+				worker="tiffToPdf+ocr"
+				;;
+				5)
+				echo "Lineart - Uniplex - OCR"
+				worker="tiffToPdf+ocr"
+				;;
+				6)
+				echo "Halftone - Uniplex - OCR"
+				worker="tiffToPdf+ocr"
+				;;
+				7)
+				echo "Gray - Uniplex"
+				worker="pdf"
+				;;
+				8)
+				echo "Color - Uniplex"
+				worker="pnmToPdf"
+				;;
+				9)
+				echo "Color - Uniplex - Trim"
+				worker="pnmToPdf+trim"
+				;;
+		    esac
+	    ;;
+	    "email")
+		    case $SCANBD_FUNCTION in
+		    esac
+		;;
 	esac
     tsp $(dirname $0)/my-worker.script $worker $workspace
 done

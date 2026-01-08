@@ -26,19 +26,19 @@ cd $workspace
 SCANIMAGE="scanimage --device-name=\"$SCANBD_DEVICE\""
 
 # +BACKEND
-SCANIMAGE="${SCANIMAGE} --df-action=Stop --swskip 3 --buffermode On --page-width 210 --page-height 297.1 -l 0 -t 0 --ald=yes"
+SCANIMAGE="${SCANIMAGE} --df-action=Stop --swskip=3 --buffermode=On --page-width=210 --page-height=297.1 -l 0 -t 0 --ald=yes"
 
 # OPTIONS
-SI_SOURCE_DUPLEX="--source \"ADF Duplex\""
-SI_SOURCE_FRONT="--source \"ADF Front\""
+SI_SOURCE_DUPLEX="--source=\"ADF Duplex\""
+SI_SOURCE_FRONT="--source=\"ADF Front\""
 
 SI_FORMAT_TIFF="--format=tiff --batch=./page_%04d.tiff"
 SI_FORMAT_PNM="--format=pnm --batch=./page_%04d.pnm"
 
-SI_MODE_COLOR="--mode Color --emphasis 0 --contrast 35 --brightness 35"
-SI_MODE_GRAY="--mode Gray --emphasis 0 --contrast 20 --brightness 20"
-SI_MODE_LINEART="--mode Lineart --emphasis 0 --contrast 50 --brightness 0"
-SI_MODE_HALFTIONE="--mode Halftone --ht-type Dither --ht-pattern 2"
+SI_MODE_COLOR="--mode=Color --emphasis=0 --contrast=35 --brightness=35"
+SI_MODE_GRAY="--mode=Gray --emphasis=0 --contrast=20 --brightness=20"
+SI_MODE_LINEART="--mode=Lineart --emphasis=0 --contrast=50 --brightness=0"
+SI_MODE_HALFTIONE="--mode=Halftone --ht-type=Dither --ht-pattern=2"
 
 echo "scanbd: $0 Begin of $SCANBD_ACTION for device $SCANBD_DEVICE"
 case $SCANBD_ACTION in
